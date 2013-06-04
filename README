@@ -1,0 +1,32 @@
+Name: check_smart
+
+This is a small Nagios plugin that uses smartmontools (smartctl) to check your
+drive S.M.A.R.T. data and reports back.
+
+The plugin complies with the Nagios guidelines, for example uses -w -c -v
+arguments etc. It also does some basic sanity checks and has a exit 3 catchall.
+
+check_smart is just a modification of check_md5 by Jack-Benny Persson
+https://bitbucket.org/jackbenny/check_md5
+
+IMPORTANT:
+This script needs to run as a privileged user (like root or sudo) because
+of smartctl. The most secure method I've found so far is:
+
+In commands.cfg...
+command_line   sudo $USER1$/check_smart --drive '$ARG1$'
+
+Create a new file /etc/sudoers.d/nagios and add this line to it
+(Use your own path)
+nagios ALL=(ALL) NO PASSWD:/path/to/script/check_smart
+
+Depending on your distro of Linux/BSD, you may need to check in
+/etc/sudoers to make sure this line either doesn't exist or it's commented out:
+
+#Defaults requiretty
+
+These steps will tell Nagios to run the command with sudo, and tell the OS that
+the Nagios user is allowed to run that script as sudo without a password. For
+maximum security, make sure you check the permissions on check_smart so only
+the correct users/groups can modify it.
+

@@ -1,0 +1,159 @@
+#!/bin/bash
+
+################################################################################
+#                                                                              #
+#  Copyright (C) 2011 Jack-Benny Persson <jake@cyberinfo.se>                   #
+#                                                                              #
+#   This program is free software; you can redistribute it and/or modify       #
+#   it under the terms of the GNU General Public License as published by       #
+#   the Free Software Foundation; either version 2 of the License, or          #
+#   (at your option) any later version.                                        #
+#                                                                              #
+#   This program is distributed in the hope that it will be useful,            #
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of             #
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the              #
+#   GNU General Public License for more details.                               #
+#                                                                              #
+#   You should have received a copy of the GNU General Public License          #
+#   along with this program; if not, write to the Free Software                #
+#   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA  #
+#                                                                              #
+################################################################################
+
+VERSION="Version Infinity"
+AUTHOR="Jack-Benny Persson. Modified for SMART by Ryan Loudfoot."
+
+# Sensor program
+CHECKPROG=/usr/sbin/smartctl
+
+# Exit codes
+STATE_OK=0
+STATE_WARNING=1
+STATE_CRITICAL=2
+STATE_UNKNOWN=3
+
+shopt -s extglob
+
+#### Functions ####
+
+# Print version information
+print_version()
+{
+	printf "\n\n$0 - $VERSION\n"
+}
+
+#Print help information
+print_help()
+{
+	print_version
+	printf "$AUTHOR\n"
+	printf "Check SMART data for a drive and report results\n"
+/bin/cat <<EOT
+
+Options:
+-h
+   Print detailed help screen
+-V
+   Print version information
+
+--warning
+   Issue a warning state instead of a critical state
+   Default is critical
+
+--drive /dev/sda
+   Set which drive to check
+ 
+EOT
+}
+
+
+###### MAIN ########
+
+# Warning threshold
+thresh_warn=
+# Critical threshold
+thresh_crit=
+# Hardware to monitor
+drive=/dev/sda
+
+# See if we have smartctl installed and can execute it
+if [[ ! -x "$CHECKPROG" ]]; then
+	printf "\nIt appears you don't have smartmontools installed in $CHECKPROG\n"
+	exit $STATE_UNKOWN
+fi
+
+# Parse command line options
+while [[ -n "$1" ]]; do 
+   case "$1" in
+
+       -h | --help)
+           print_help
+           exit $STATE_OK
+           ;;
+
+       -V | --version)
+           print_version
+           exit $STATE_OK
+           ;;
+
+       -\?)
+	   print_help
+           exit $STATE_OK
+           ;;
+
+       --warning)
+           warning="yes"
+	   shift 1
+	   ;;
+
+       --drive)
+	   if [[ -z "$2" ]]; then
+		printf "\nOption $1 requires an argument\n | Option $1 requires an argument"
+		print_help
+		exit $STATE_UNKNOWN
+	   fi
+		drive=$2
+           shift 2
+           ;;
+
+	*)
+           printf "\nInvalid option $1 | Invalid option $1"
+           print_help
+           exit $STATE_UNKNOWN
+           ;;
+
+
+   esac
+done
+
+# Check if a drive was specified
+if [[ -z "$drive" ]]; then
+	# No sensor to monitor were specified
+	printf "\nNo drive specified"
+	print_help
+	exit $STATE_UNKNOWN
+fi
+
+
+#Get the SMART data
+smart=`${CHECKPROG} -d ata -H "$drive" | grep "result" | cut -d: -f2 | cut -c2-7 `
+
+perfdata=`${CHECKPROG} -d ata -H "$drive" | grep "result" `
+
+
+if [[ "$smart" == "PASSED" ]]; then
+	printf "$drive is OK | $perfdata\n"
+	exit $STATE_OK
+
+#See if we wanted a warning instead of a critical
+elif [[ "$warning" == "yes" ]]; then
+		printf "$drive - S.M.A.R.T. WARNING | $perfdata\n"
+		exit $STATE_WARNING
+
+#Critical
+else	
+	printf "$drive - S.M.A.R.T. CRITICAL | $perfdata\n"
+  exit $STATE_CRITICAL
+fi
+
+exit $STATE_UNKNOWN

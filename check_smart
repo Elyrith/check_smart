@@ -20,8 +20,13 @@
 #                                                                              #
 ################################################################################
 
+###############################################################################
+# The latest version of check_smart can be found at:                          #
+# https://github.com/Elyrith/check_smart                                      #
+###############################################################################
+
 VERSION="Version Infinity"
-AUTHOR="Jack-Benny Persson. Modified for SMART by Ryan Loudfoot."
+AUTHOR="(c) 2011 Jack-Benny Persson (jack-benny@cyberinfo.se), repurposed by Ryan Loudfoot (elyrith@gmail.com)"
 
 # Sensor program
 CHECKPROG=/usr/sbin/smartctl

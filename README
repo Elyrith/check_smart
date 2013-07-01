@@ -30,3 +30,12 @@ the Nagios user is allowed to run that script as sudo without a password. For
 maximum security, make sure you check the permissions on check_smart so only
 the correct users/groups can modify it.
 
+
+TROUBLESHOOTING:
+
+Q: I get this message: "sudo: check_smart: command not found"
+A: Make sure the script is set as executable ("chmod +x /path/to/script/check_smart")
+
+Q: I get this message: "bash: ./check_smart: Permission denied"
+A: Make sure you're running it as a privileged user (ex. "sudo ./check_smart")
+

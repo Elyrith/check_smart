@@ -52,15 +52,15 @@ shopt -s extglob
 # Print version information
 print_version()
 {
-	printf "\n\n$0 - $VERSION\n"
+	echo "$0 - $VERSION"
 }
 
 #Print help information
 print_help()
 {
 	print_version
-	printf "$AUTHOR\n"
-	printf "Check SMART data for a drive and report results\n"
+	echo "$AUTHOR"
+	echo "Check SMART data for a drive and report results"
 /bin/cat <<EOT
 
 Options:
@@ -91,7 +91,7 @@ drive=/dev/sda
 
 # See if we have smartctl installed and can execute it
 if [[ ! -x "$CHECKPROG" ]]; then
-	printf "\nIt appears you don't have smartmontools installed in $CHECKPROG\n"
+	echo "It appears you don't have smartmontools installed in $CHECKPROG"
 	exit $STATE_UNKOWN
 fi
 
@@ -121,7 +121,7 @@ while [[ -n "$1" ]]; do
 
        --drive)
 	   if [[ -z "$2" ]]; then
-		printf "\nOption $1 requires an argument\n | Option $1 requires an argument"
+		echo "Option $1 requires an argument | Option $1 requires an argument"
 		print_help
 		exit $STATE_UNKNOWN
 	   fi
@@ -130,7 +130,7 @@ while [[ -n "$1" ]]; do
            ;;
 
 	*)
-           printf "\nInvalid option $1 | Invalid option $1"
+           echo "Invalid option $1 | Invalid option $1"
            print_help
            exit $STATE_UNKNOWN
            ;;
@@ -142,7 +142,7 @@ done
 # Check if a drive was specified
 if [[ -z "$drive" ]]; then
 	# No sensor to monitor were specified
-	printf "\nNo drive specified"
+	echo "No drive specified"
 	print_help
 	exit $STATE_UNKNOWN
 fi
@@ -155,17 +155,17 @@ perfdata=$($CHECKPROG -d ata -H "$drive" | grep "result")
 
 
 if [[ "$smart" == "PASSED" ]]; then
-	printf "$drive is OK | $perfdata\n"
+	echo "$drive is OK | $perfdata"
 	exit $STATE_OK
 
 #See if we wanted a warning instead of a critical
 elif [[ "$warning" == "yes" ]]; then
-		printf "$drive - S.M.A.R.T. WARNING | $perfdata\n"
+		echo "$drive - S.M.A.R.T. WARNING | $perfdata"
 		exit $STATE_WARNING
 
 #Critical
 else	
-	printf "$drive - S.M.A.R.T. CRITICAL | $perfdata\n"
+	echo "$drive - S.M.A.R.T. CRITICAL | $perfdata"
   exit $STATE_CRITICAL
 fi
 

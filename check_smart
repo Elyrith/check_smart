@@ -26,16 +26,23 @@
 ###############################################################################
 
 VERSION="Version Infinity"
-AUTHOR="(c) 2011 Jack-Benny Persson (jack-benny@cyberinfo.se), repurposed by Ryan Loudfoot (elyrith@gmail.com)"
+AUTHOR="(c) 2011 Jack-Benny Persson (jack-benny@cyberinfo.se), repurposed by Ryan Loudfoot (ryan@delotha.com)"
 
 # Sensor program
 CHECKPROG=/usr/sbin/smartctl
 
-# Exit codes
-STATE_OK=0
-STATE_WARNING=1
-STATE_CRITICAL=2
-STATE_UNKNOWN=3
+# Ryan's note: utils.sh is installed with nagios-plugins in with the plugins
+# Check if utils.sh exists. This lets you use check_domain in a testing environment
+# or outside of Nagios.
+if [ -e "$PROGPATH/utils.sh" ]; then
+	. "$PROGPATH/utils.sh"
+else
+	STATE_OK=0
+	STATE_WARNING=1
+	STATE_CRITICAL=2
+	STATE_UNKNOWN=3
+#	STATE_DEPENDENT=4    (Commented because it's unused.)
+fi
 
 shopt -s extglob
 
@@ -141,9 +148,9 @@ fi
 
 
 #Get the SMART data
-smart=`${CHECKPROG} -d ata -H "$drive" | grep "result" | cut -d: -f2 | cut -c2-7 `
+smart=$($CHECKPROG -d ata -H "$drive" | grep "result" | cut -d: -f2 | cut -c2-7)
 
-perfdata=`${CHECKPROG} -d ata -H "$drive" | grep "result" `
+perfdata=$($CHECKPROG -d ata -H "$drive" | grep "result")
 
 
 if [[ "$smart" == "PASSED" ]]; then

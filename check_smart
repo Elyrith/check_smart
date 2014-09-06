@@ -21,8 +21,8 @@
 # https://github.com/Elyrith/check_smart                                      #
 ###############################################################################
 
-VERSION="Version Infinity"
-AUTHOR="(c) 2013 Ryan Loudfoot (ryan@delotha.com)"
+VERSION="Version 1.0"
+AUTHOR="Ryan Loudfoot (ryan@delotha.com)"
 
 # Sensor program
 CHECKPROG=/usr/sbin/smartctl

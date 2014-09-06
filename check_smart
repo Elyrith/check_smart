@@ -30,8 +30,8 @@ CHECKPROG=/usr/sbin/smartctl
 # Ryan's note: utils.sh is installed with nagios-plugins in with the plugins
 # Check if utils.sh exists. This lets you use check_domain in a testing environment
 # or outside of Nagios.
-if [ -e "$PROGPATH/utils.sh" ]; then
-	. "$PROGPATH/utils.sh"
+if [ -e "utils.sh" ]; then
+	. "utils.sh"
 else
 	STATE_OK=0
 	STATE_WARNING=1

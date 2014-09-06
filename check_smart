@@ -25,7 +25,7 @@ VERSION="Version 1.0"
 AUTHOR="Ryan Loudfoot (ryan@delotha.com)"
 
 # Sensor program
-CHECKPROG=/usr/sbin/smartctl
+SENSORPROG=$(whereis smartctl | awk '{print $2}')
 
 # Ryan's note: utils.sh is installed with nagios-plugins in with the plugins
 # Check if utils.sh exists. This lets you use check_domain in a testing environment
@@ -85,8 +85,8 @@ thresh_crit=
 drive=/dev/sda
 
 # See if we have smartctl installed and can execute it
-if [[ ! -x "$CHECKPROG" ]]; then
-	echo "It appears you don't have smartmontools installed in $CHECKPROG"
+if [[ -z "$CHECKPROG" ]]; then
+	echo "It appears you don't have smartmontools installed."
 	exit $STATE_UNKOWN
 fi
 

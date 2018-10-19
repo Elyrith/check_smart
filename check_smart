@@ -152,16 +152,18 @@ perfdata=$($SENSORPROG -d ata -H "$drive" | grep "result")
 if [[ "$smart" == "PASSED" ]]; then
 	echo "$drive is OK | $perfdata"
 	exit $STATE_OK
+fi
 
-#See if we wanted a warning instead of a critical
-elif [[ "$warning" == "yes" ]]; then
+if [[ "$smart" == "FAILED!" ]]; then
+	#See if we wanted a warning instead of a critical
+	if [[ "$warning" == "yes" ]]; then
 		echo "$drive - S.M.A.R.T. WARNING | $perfdata"
 		exit $STATE_WARNING
-
-#Critical
-else	
-	echo "$drive - S.M.A.R.T. CRITICAL | $perfdata"
-  exit $STATE_CRITICAL
+	else
+		#Critical
+		echo "$drive - S.M.A.R.T. CRITICAL | $perfdata"
+		exit $STATE_CRITICAL
+	fi
 fi
 
 exit $STATE_UNKNOWN

@@ -69,8 +69,11 @@ Options:
    Default is critical
 
 --drive /dev/sda
-   Set which drive to check
- 
+   Set which drive to check (default: /dev/sda)
+
+--drive_type <ata/scsi/etc>
+   Select which type of drive you're monitoring (default: ata)
+
 EOT
 }
 
@@ -83,6 +86,8 @@ thresh_warn=
 thresh_crit=
 # Hardware to monitor
 drive=/dev/sda
+# Drive type (ata/scsi)
+drive_type=ata
 
 # See if we have smartctl installed and can execute it
 if [[ ! -x "$SENSORPROG" ]]; then
@@ -123,7 +128,15 @@ while [[ -n "$1" ]]; do
 		drive=$2
            shift 2
            ;;
-
+       --drive_type)
+	   if [[ -z "$2" ]]; then
+		echo "Option $1 requires an argument | Option $1 requires an argument"
+		print_help
+		exit $STATE_UNKNOWN
+	   fi
+	        drive_type=$2
+	   shift 2
+	   ;;
 	*)
            echo "Invalid option $1 | Invalid option $1"
            print_help
@@ -144,9 +157,9 @@ fi
 
 
 #Get the SMART data
-smart=$($SENSORPROG -d ata -H "$drive" | grep "result" | cut -d: -f2 | cut -c2-7)
+smart=$($SENSORPROG -d "$drive_type" -H "$drive" | grep "result" | cut -d: -f2 | cut -c2-7)
 
-perfdata=$($SENSORPROG -d ata -H "$drive" | grep "result")
+perfdata=$($SENSORPROG -d "$drive_type" -H "$drive" | grep "result")
 
 
 if [[ "$smart" == "PASSED" ]]; then
